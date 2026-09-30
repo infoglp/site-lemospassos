@@ -126,6 +126,11 @@ body {
     transform 1400ms cubic-bezier(0.19, 1, 0.22, 1);
 }
 
+.intro-word {
+  animation: introWordReveal 520ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+  display: inline-block;
+}
+
 .type-line-care {
   color: var(--brand-blue);
   font-size: 1.08em;
@@ -715,6 +720,20 @@ body {
 @keyframes cursorBlink {
   50% {
     opacity: 0;
+  }
+}
+
+@keyframes introWordReveal {
+  from {
+    filter: blur(3px);
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

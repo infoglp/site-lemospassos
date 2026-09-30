@@ -103,7 +103,15 @@ function initIntro() {
     sequence.forEach((step, index) => {
       const delay = lastIndex ? Math.round((duration * index) / lastIndex) : 0;
       window.setTimeout(() => {
-        step.target.textContent = step.text;
+        if (index > 0) {
+          const previousTarget = sequence[index - 1].target;
+          if (step.target === previousTarget) step.target.append(document.createTextNode(" "));
+          else step.target.before(document.createTextNode(" "));
+        }
+        const word = document.createElement("span");
+        word.className = "intro-word";
+        word.textContent = step.text;
+        step.target.append(word);
       }, delayStart + delay);
     });
     window.setTimeout(() => onComplete?.(), delayStart + duration);
@@ -120,13 +128,13 @@ function initIntro() {
 
   revealWords([
     { target: typedLineOne, text: "acima" },
-    { target: typedLineOne, text: "acima de" },
-    { target: typedLineOne, text: firstLine },
+    { target: typedLineOne, text: "de" },
+    { target: typedLineOne, text: "tudo," },
   ], (firstLine.length - 1) * typeDelay, () => {
     window.setTimeout(() => {
       careLine.append(cursor);
       revealWords([
-        { target: typedCareLead, text: careLeadText },
+        { target: typedCareLead, text: "o" },
         { target: typedCareWord, text: careWordText },
       ], (careLeadText.length + careWordText.length - 2) * typeDelay, () => {
         window.setTimeout(() => {
