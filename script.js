@@ -253,7 +253,7 @@ function initCounters() {
   const counters = document.querySelectorAll(".group-stat strong[data-target]");
   if (!counters.length) return;
 
-  function animateCounter(counter, duration = 10000) {
+  function animateCounter(counter, duration = 3000) {
     const target = Number(counter.dataset.target);
     const startTime = performance.now();
     const format = new Intl.NumberFormat("pt-BR");
@@ -440,7 +440,33 @@ function initMailForms() {
   }
 }
 
+function initSocialLinks() {
+  const socialMarkup = `<div class="social-links" aria-label="Redes sociais">
+    <a href="https://www.instagram.com/grupolemospassos" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Grupo LemosPassos"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle class="social-icon-dot" cx="17.5" cy="6.5" r="1"/></svg></a>
+    <a href="https://www.linkedin.com/in/grupo-lemos-passos-180b8b17a" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn do Grupo LemosPassos"><svg class="linkedin-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg></a>
+  </div>`;
+
+  document.querySelectorAll(".home-nav a").forEach((link) => {
+    if (link.textContent.trim().toLocaleLowerCase("pt-BR") === "contato") link.remove();
+  });
+
+  document.querySelectorAll(".home-header, .page-header").forEach((header) => {
+    if (header.querySelector(".social-links")) return;
+    const homeMenu = header.querySelector(".home-menu");
+    if (homeMenu) homeMenu.insertAdjacentHTML("beforebegin", socialMarkup);
+  });
+
+  document.querySelectorAll(".site-credit").forEach((footer) => {
+    if (footer.querySelector(".social-links")) return;
+    const links = footer.querySelectorAll("a");
+    const lastLink = links[links.length - 1];
+    if (lastLink) lastLink.insertAdjacentHTML("beforebegin", socialMarkup);
+    else footer.insertAdjacentHTML("beforeend", socialMarkup);
+  });
+}
+
 initPageLoader();
+initSocialLinks();
 initOfficialLogos();
 initIntro();
 initFrontsExplorer();

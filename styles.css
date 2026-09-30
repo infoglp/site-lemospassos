@@ -320,6 +320,54 @@ body {
   padding-bottom: 8px;
 }
 
+.social-links {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 12px;
+}
+
+.social-links a {
+  align-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: var(--brand-deep);
+  display: inline-flex;
+  height: 36px;
+  justify-content: center;
+  opacity: 0.88;
+  transition: background-color 180ms ease, color 180ms ease, opacity 180ms ease, transform 180ms ease;
+  width: 36px;
+}
+
+.social-links a:hover {
+  background: var(--brand-blue);
+  border-color: var(--brand-blue);
+  color: #fff;
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.social-links svg {
+  fill: none;
+  height: 19px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  width: 19px;
+}
+
+.social-links svg .social-icon-dot { fill: currentColor; stroke: none; }
+.social-links svg.linkedin-mark { fill: currentColor; stroke: none; }
+
+.home-header .social-links a,
+.page-header-over .social-links a,
+.page-header-light .social-links a,
+.site-credit .social-links a { color: #fff; }
+
+.site-credit .social-links { align-self: center; }
+
 .home-menu-arrow,
 .cta-icon {
   color: var(--brand-blue);
@@ -1230,7 +1278,19 @@ body {
   color: var(--brand-mid);
 }
 
-.site-credit, .general-contact {
+.site-credit {
+  background: var(--brand-deep);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  padding: clamp(22px, 3vw, 34px) 20px;
+  text-align: center;
+}
+
+.general-contact {
   background: #f4f8f8;
   border-top: 1px solid rgba(5, 45, 75, 0.18);
   display: flex;
@@ -1244,7 +1304,17 @@ body {
   border-top-color: rgba(255, 255, 255, 0.18);
 }
 
-.site-credit a, .general-contact a {
+.site-credit a {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 180ms ease;
+}
+
+.general-contact a {
   color: rgba(5, 45, 75, 0.62);
   font-size: 0.78rem;
   font-weight: 700;
@@ -1254,9 +1324,8 @@ body {
   transition: color 180ms ease;
 }
 
-.site-credit-dark a {
-  color: rgba(255, 255, 255, 0.68);
-}
+.site-credit .social-links a { color: #fff; }
+.site-credit .social-links a:hover { color: #fff; }
 
 .site-credit a:hover, .general-contact a:hover {
   color: var(--brand-mid);
@@ -1326,7 +1395,7 @@ body {
   .admin-panel-head { align-items: start; flex-direction: column; gap: 20px; }
   .news-feature { grid-template-columns: 1fr; }
   .news-feature img { height: 280px; }
-  .site-credit { align-items: center; gap: 16px; }
+  .site-credit { align-items: center; gap: 16px; justify-content: center; }
 }
 
 .solution-detail {
