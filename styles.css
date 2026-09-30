@@ -1249,7 +1249,9 @@ body {
 .contact-grid {
   border-top: 1px solid rgba(5, 45, 75, 0.2);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-inline: auto;
+  max-width: 1180px;
   margin-top: clamp(70px, 9vw, 125px);
 }
 
@@ -1260,7 +1262,7 @@ body {
   padding: clamp(24px, 3vw, 42px);
 }
 
-.contact-grid article:nth-child(3n) {
+.contact-grid article:nth-child(2n) {
   border-right: 0;
 }
 
