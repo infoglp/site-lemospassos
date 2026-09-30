@@ -98,16 +98,15 @@ function initIntro() {
     }, pageDelay);
   }
 
-  function typeText(target, text, delayStart, onComplete) {
-    [...text].forEach((character, index) => {
+  function revealWords(sequence, duration, onComplete, delayStart = 0) {
+    const lastIndex = sequence.length - 1;
+    sequence.forEach((step, index) => {
+      const delay = lastIndex ? Math.round((duration * index) / lastIndex) : 0;
       window.setTimeout(() => {
-        target.textContent += character;
-
-        if (index === text.length - 1 && onComplete) {
-          onComplete();
-        }
-      }, delayStart + index * typeDelay);
+        step.target.textContent = step.text;
+      }, delayStart + delay);
     });
+    window.setTimeout(() => onComplete?.(), delayStart + duration);
   }
 
   if (reducedMotion) {
@@ -119,19 +118,24 @@ function initIntro() {
     return;
   }
 
-  typeText(typedLineOne, firstLine, startDelay, () => {
+  revealWords([
+    { target: typedLineOne, text: "acima" },
+    { target: typedLineOne, text: "acima de" },
+    { target: typedLineOne, text: firstLine },
+  ], (firstLine.length - 1) * typeDelay, () => {
     window.setTimeout(() => {
       careLine.append(cursor);
-      typeText(typedCareLead, careLeadText, 0, () => {
-        typeText(typedCareWord, careWordText, 0, () => {
-          window.setTimeout(() => {
-            revealSignature();
-            window.setTimeout(enterHome, zoomDelay);
-          }, signatureDelay);
-        });
+      revealWords([
+        { target: typedCareLead, text: careLeadText },
+        { target: typedCareWord, text: careWordText },
+      ], (careLeadText.length + careWordText.length - 2) * typeDelay, () => {
+        window.setTimeout(() => {
+          revealSignature();
+          window.setTimeout(enterHome, zoomDelay);
+        }, signatureDelay);
       });
     }, suspenseDelay);
-  });
+  }, startDelay);
 }
 
 function initFrontsExplorer() {
@@ -253,7 +257,7 @@ function initCounters() {
   const counters = document.querySelectorAll(".group-stat strong[data-target]");
   if (!counters.length) return;
 
-  function animateCounter(counter, duration = 3000) {
+  function animateCounter(counter, duration = 2000) {
     const target = Number(counter.dataset.target);
     const startTime = performance.now();
     const format = new Intl.NumberFormat("pt-BR");
