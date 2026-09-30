@@ -441,9 +441,9 @@ function initMailForms() {
 }
 
 function initSocialLinks() {
-  const socialMarkup = `<div class="social-links" aria-label="Redes sociais">
-    <a href="https://www.instagram.com/grupolemospassos" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Grupo LemosPassos"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle class="social-icon-dot" cx="17.5" cy="6.5" r="1"/></svg></a>
-    <a href="https://www.linkedin.com/in/grupo-lemos-passos-180b8b17a" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn do Grupo LemosPassos"><svg class="linkedin-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg></a>
+  const makeSocialMarkup = (color) => `<div class="social-links" aria-label="Redes sociais" style="align-items:center;display:flex;flex:0 0 auto;gap:10px">
+    <a href="https://www.instagram.com/grupolemospassos" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Grupo LemosPassos" style="align-items:center;border:1px solid ${color};border-radius:50%;color:${color};display:inline-flex;height:36px;justify-content:center;width:36px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="${color}" stroke="none"/></svg></a>
+    <a href="https://www.linkedin.com/in/grupo-lemos-passos-180b8b17a" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn do Grupo LemosPassos" style="align-items:center;border:1px solid ${color};border-radius:50%;color:${color};display:inline-flex;height:36px;justify-content:center;width:36px"><svg width="20" height="20" class="linkedin-mark" viewBox="0 0 24 24" fill="${color}" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg></a>
   </div>`;
 
   document.querySelectorAll(".home-nav a").forEach((link) => {
@@ -453,15 +453,16 @@ function initSocialLinks() {
   document.querySelectorAll(".home-header, .page-header").forEach((header) => {
     if (header.querySelector(".social-links")) return;
     const homeMenu = header.querySelector(".home-menu");
-    if (homeMenu) homeMenu.insertAdjacentHTML("beforebegin", socialMarkup);
+    const color = header.classList.contains("page-header") && !header.classList.contains("page-header-light") && !header.classList.contains("page-header-over") ? "#052d4b" : "#ffffff";
+    if (homeMenu) homeMenu.insertAdjacentHTML("beforebegin", makeSocialMarkup(color));
   });
 
   document.querySelectorAll(".site-credit").forEach((footer) => {
     if (footer.querySelector(".social-links")) return;
     const links = footer.querySelectorAll("a");
     const lastLink = links[links.length - 1];
-    if (lastLink) lastLink.insertAdjacentHTML("beforebegin", socialMarkup);
-    else footer.insertAdjacentHTML("beforeend", socialMarkup);
+    if (lastLink) lastLink.insertAdjacentHTML("beforebegin", makeSocialMarkup("#ffffff"));
+    else footer.insertAdjacentHTML("beforeend", makeSocialMarkup("#ffffff"));
   });
 }
 
