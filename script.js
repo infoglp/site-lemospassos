@@ -74,9 +74,9 @@ function initIntro() {
 
   if (!intro || !typedLineOne || !typedCareLead || !typedCareWord || !cursor || !signature) return;
 
-  const typeDelay = 128;
   const startDelay = 420;
-  const suspenseDelay = 1180;
+  const lineGap = 300;
+  const lineDuration = reducedMotion ? 520 : 900;
   const signatureDelay = 720;
   const zoomDelay = 1250;
   const pageDelay = 1550;
@@ -98,43 +98,33 @@ function initIntro() {
     }, pageDelay);
   }
 
-  function revealWords(sequence, duration, onComplete, delayStart = 0) {
-    const lastIndex = sequence.length - 1;
-    sequence.forEach((step, index) => {
-      const delay = lastIndex ? Math.round((duration * index) / lastIndex) : 0;
-      window.setTimeout(() => {
-        if (index > 0) {
-          const previousTarget = sequence[index - 1].target;
-          if (step.target === previousTarget) step.target.append(document.createTextNode(" "));
-          else step.target.before(document.createTextNode(" "));
-        }
-        const word = document.createElement("span");
-        word.className = "intro-word";
-        word.textContent = step.text;
-        step.target.append(word);
-      }, delayStart + delay);
+  function animateIntroLine(line, direction, delay) {
+    const offset = reducedMotion ? 0 : direction * 34;
+    const animation = line.animate([
+      { opacity: 0, transform: `translateY(${offset}px)` },
+      { opacity: 1, transform: "translateY(0)" },
+    ], {
+      delay,
+      duration: lineDuration,
+      easing: "cubic-bezier(0.22, 0.75, 0.25, 1)",
+      fill: "both",
     });
-    window.setTimeout(() => onComplete?.(), delayStart + duration);
+    animation.onfinish = () => animation.cancel();
   }
 
-  revealWords([
-    { target: typedLineOne, text: "acima" },
-    { target: typedLineOne, text: "de" },
-    { target: typedLineOne, text: "tudo," },
-  ], (firstLine.length - 1) * typeDelay, () => {
-    window.setTimeout(() => {
-      careLine.append(cursor);
-      revealWords([
-        { target: typedCareLead, text: "o" },
-        { target: typedCareWord, text: careWordText },
-      ], (careLeadText.length + careWordText.length - 2) * typeDelay, () => {
-        window.setTimeout(() => {
-          revealSignature();
-          window.setTimeout(enterHome, zoomDelay);
-        }, signatureDelay);
-      });
-    }, suspenseDelay);
-  }, startDelay);
+  typedLineOne.textContent = firstLine;
+  typedCareLead.textContent = careLeadText;
+  typedCareWord.textContent = careWordText;
+
+  const secondLineDelay = startDelay + lineDuration + lineGap;
+  animateIntroLine(typedLineOne.parentElement, -1, startDelay);
+  animateIntroLine(careLine, 1, secondLineDelay);
+
+  window.setTimeout(() => careLine.append(cursor), secondLineDelay);
+  window.setTimeout(() => {
+    revealSignature();
+    window.setTimeout(enterHome, zoomDelay);
+  }, secondLineDelay + lineDuration + signatureDelay);
 }
 
 function initFrontsExplorer() {
