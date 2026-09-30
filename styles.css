@@ -1644,4 +1644,13 @@ body {
     scroll-behavior: auto !important;
     transition-duration: 1ms !important;
   }
+
+  .intro-word {
+    animation: introWordFade 420ms ease both !important;
+  }
+
+  @keyframes introWordFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 }

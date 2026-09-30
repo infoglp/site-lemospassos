@@ -117,15 +117,6 @@ function initIntro() {
     window.setTimeout(() => onComplete?.(), delayStart + duration);
   }
 
-  if (reducedMotion) {
-    typedLineOne.textContent = firstLine;
-    typedCareLead.textContent = careLeadText;
-    typedCareWord.textContent = careWordText;
-    revealSignature();
-    window.setTimeout(enterHome, 700);
-    return;
-  }
-
   revealWords([
     { target: typedLineOne, text: "acima" },
     { target: typedLineOne, text: "de" },
