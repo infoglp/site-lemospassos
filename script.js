@@ -441,6 +441,13 @@ function initMailForms() {
 }
 
 function initSocialLinks() {
+  const stylesheet = document.querySelector('link[rel="stylesheet"][href*="styles.css"]');
+  if (stylesheet) {
+    const stylesheetUrl = new URL(stylesheet.href);
+    stylesheetUrl.searchParams.set("v", "social-footer-20260930");
+    stylesheet.href = stylesheetUrl.href;
+  }
+
   const makeSocialMarkup = (color) => `<div class="social-links" aria-label="Redes sociais" style="align-items:center;display:flex;flex:0 0 auto;gap:10px">
     <a href="https://www.instagram.com/grupolemospassos" target="_blank" rel="noopener noreferrer" aria-label="Instagram do Grupo LemosPassos" style="align-items:center;border:1px solid ${color};border-radius:50%;color:${color};display:inline-flex;height:36px;justify-content:center;width:36px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="${color}" stroke="none"/></svg></a>
     <a href="https://www.linkedin.com/in/grupo-lemos-passos-180b8b17a" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn do Grupo LemosPassos" style="align-items:center;border:1px solid ${color};border-radius:50%;color:${color};display:inline-flex;height:36px;justify-content:center;width:36px"><svg width="20" height="20" class="linkedin-mark" viewBox="0 0 24 24" fill="${color}" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg></a>
