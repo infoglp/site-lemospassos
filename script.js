@@ -373,26 +373,7 @@ function initBrazilMap() {
     });
 }
 
-function initCareerDisclosure() {
-  const careerForm = document.querySelector("#careerForm");
-  const anchor = document.querySelector("[data-career-form-anchor]");
-  if (!careerForm || !anchor) return;
-
-  const disclosure = document.createElement("details");
-  disclosure.className = "career-disclosure";
-  disclosure.innerHTML = '<summary><span>Envie seu currÃ­culo</span><span aria-hidden="true">+</span></summary><p>Preencha seus dados para preparar o envio do currÃ­culo por e-mail.</p>';
-  disclosure.replaceChildren();
-  const summary = document.createElement("summary");
-  summary.innerHTML = '<span>Envie seu curriculo</span><span aria-hidden="true">+</span>';
-  const description = document.createElement("p");
-  description.textContent = "Preencha seus dados para preparar o envio do curriculo por e-mail.";
-  disclosure.append(summary, description);
-  anchor.append(disclosure);
-  disclosure.append(careerForm);
-}
-
 function initMailForms() {
-  const careerForm = document.querySelector("#careerForm");
   const contactForm = document.querySelector("#contactForm");
 
   function openMailForm(form, recipient, subjectPrefix) {
@@ -408,20 +389,10 @@ function initMailForms() {
       "",
       "Mensagem:",
       message,
-      "",
-      form === careerForm ? "Observação: anexar currículo a este e-mail antes de enviar." : "",
     ].filter(Boolean);
 
     const mailto = `mailto:${recipient}?subject=${encodeURIComponent(`${subjectPrefix}: ${subject}`)}&body=${encodeURIComponent(bodyLines.join("\n"))}`;
     window.location.href = mailto;
-  }
-
-  if (careerForm) {
-    careerForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (!careerForm.reportValidity()) return;
-      openMailForm(careerForm, "curriculos@lemospassos.com", "Currículo pelo site");
-    });
   }
 
   if (contactForm) {
@@ -437,7 +408,7 @@ function initSocialLinks() {
   const stylesheet = document.querySelector('link[rel="stylesheet"][href*="styles.css"]');
   if (stylesheet) {
     const stylesheetUrl = new URL(stylesheet.href);
-    stylesheetUrl.searchParams.set("v", "social-footer-20260930");
+    stylesheetUrl.searchParams.set("v", "social-footer-career-20261005");
     stylesheet.href = stylesheetUrl.href;
   }
 
@@ -475,5 +446,4 @@ initActuationCards();
 initCmsContent();
 initCounters();
 initBrazilMap();
-initCareerDisclosure();
 initMailForms();

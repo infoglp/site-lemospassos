@@ -1474,14 +1474,10 @@ body {
   color: var(--brand-blue);
 }
 
-.career-disclosure { border-bottom: 1px solid rgba(255, 255, 255, 0.24); border-top: 1px solid rgba(255, 255, 255, 0.24); margin-top: clamp(60px, 8vw, 110px); max-width: 760px; padding: 22px 0; }
-.career-disclosure summary { align-items: center; color: #fff; cursor: pointer; display: flex; font-size: clamp(1.4rem, 2vw, 2.1rem); font-weight: 700; justify-content: space-between; list-style: none; }
-.career-disclosure summary::-webkit-details-marker { display: none; }
-.career-disclosure summary span:last-child { color: var(--brand-blue); font-size: 1.8rem; font-weight: 400; transition: transform 200ms ease; }
-.career-disclosure[open] summary span:last-child { transform: rotate(45deg); }
-.career-disclosure > p { color: rgba(255, 255, 255, 0.7); line-height: 1.5; margin: 12px 0 0; }
-.career-disclosure .career-form { margin-top: 26px; }
-.career-disclosure .form-heading { display: none; }
+.career-portal-link { align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.24); border-top: 1px solid rgba(255, 255, 255, 0.24); color: #fff; display: flex; font-size: clamp(1.4rem, 2vw, 2.1rem); font-weight: 700; justify-content: space-between; margin-top: clamp(60px, 8vw, 110px); max-width: 760px; padding: 22px 0; text-decoration: none; transition: color 200ms ease; }
+.career-portal-link span:last-child { color: var(--brand-blue); font-size: 1.8rem; font-weight: 400; transition: transform 200ms ease; }
+.career-portal-link:hover { color: var(--brand-blue); }
+.career-portal-link:hover span:last-child { transform: translate(4px, -4px); }
 
 @media (max-width: 1100px) {
   .page-header,
