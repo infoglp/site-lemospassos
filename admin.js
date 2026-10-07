@@ -30,7 +30,23 @@ function render(data) {
   form.querySelector("[data-map-image-url]").value = data.mapImage || defaults.mapImage;
   form.querySelector("[data-map-image-preview]").src = data.mapImage || defaults.mapImage;
   editor.innerHTML = categories.map((category) => `<fieldset class="admin-fieldset"><legend>${category}</legend><div class="admin-image-list" data-category="${category}">${(data.partners[category] || []).map((url) => `<div class="admin-image-row"><img class="admin-image-preview" src="${url}" alt="" /><input value="${url}" data-image-url /><input type="file" accept="image/*" data-image-file /><button type="button" data-remove-image>Remover</button></div>`).join("")}</div><button type="button" class="admin-small-button" data-add-image data-category="${category}">+ Adicionar imagem</button></fieldset>`).join("");
-  newsEditor.innerHTML = (data.news || []).map((item, index) => `<fieldset class="admin-fieldset" data-news-index="${index}"><legend>Notícia ${index + 1}</legend><label>Título<input value="${item.title || ""}" data-news-title /></label><label>Resumo<textarea data-news-excerpt>${item.excerpt || ""}</textarea></label><label>Imagem<input value="${item.image || ""}" data-news-image /></label><label>Link<input value="${item.url || ""}" data-news-url /></label><button type="button" class="admin-small-button" data-remove-news>Remover notícia</button></fieldset>`).join("");
+  newsEditor.innerHTML = (data.news || []).map((item, index) => {
+    const image = item.image || "";
+    const isDataImage = image.startsWith("data:image/");
+    return `<fieldset class="admin-fieldset" data-news-index="${index}"><legend>Notícia ${index + 1}</legend><label>Título<input value="${item.title || ""}" data-news-title /></label><label>Resumo<textarea data-news-excerpt>${item.excerpt || ""}</textarea></label><label>URL ou caminho da imagem<input value="${isDataImage ? "" : image}" data-news-image-url /></label><input type="hidden" value="${isDataImage ? image : ""}" data-news-image-data /><label class="admin-news-image-file">Selecionar arquivo da imagem principal<input type="file" accept="image/*" data-news-image-file /></label><img class="admin-news-image-preview" src="${image}" alt="Prévia da imagem principal da notícia" data-news-image-preview /><label>Link<input value="${item.url || ""}" data-news-url /></label><p class="admin-image-status" data-news-image-status></p><button type="button" class="admin-small-button" data-remove-news>Remover notícia</button></fieldset>`;
+  }).join("");
+}
+
+async function imageFileToDataUrl(file) {
+  const bitmap = await createImageBitmap(file);
+  const maxSide = 1800;
+  const scale = Math.min(1, maxSide / bitmap.width, maxSide / bitmap.height);
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  return canvas.toDataURL("image/webp", 0.82);
 }
 
 function enhanceNewsEditor(data) {
@@ -48,7 +64,7 @@ function enhanceNewsEditor(data) {
     attachments.innerHTML = `Anexos da notícia<input type="file" accept="image/*" multiple data-news-files /><div class="admin-attachment-list"></div>`;
     box.append(attachments);
     const list = attachments.querySelector(".admin-attachment-list");
-    (item.attachments || []).forEach((src) => list.insertAdjacentHTML("beforeend", `<div class="admin-attachment"><img src="${src}" alt="" /><input type="hidden" value="${src}" data-news-attachment /></div>`));
+    (item.attachments || []).forEach((src) => list.insertAdjacentHTML("beforeend", `<div class="admin-attachment"><img src="${src}" alt="" /><input type="hidden" value="${src}" data-news-attachment /><button type="button" data-remove-news-attachment aria-label="Remover anexo">×</button></div>`));
   });
 }
 
@@ -57,7 +73,7 @@ function readData() {
   data.metrics = { meals: Number(form.meals.value), employees: Number(form.employees.value), restaurants: Number(form.restaurants.value) };
   data.mapImage = form.querySelector("[data-map-image-url]").value.trim() || defaults.mapImage;
   data.partners = Object.fromEntries(categories.map((category) => [category, [...document.querySelectorAll(`[data-category="${category}"] [data-image-url]`)].map((input) => input.value.trim()).filter(Boolean)]));
-  data.news = [...document.querySelectorAll("[data-news-index]")].map((box) => ({ title: box.querySelector("[data-news-title]").value.trim(), excerpt: box.querySelector("[data-news-excerpt]").value.trim(), body: box.querySelector("[data-news-body]").value.trim(), image: box.querySelector("[data-news-image]").value.trim(), attachments: [...box.querySelectorAll("[data-news-attachment]")].map((input) => input.value), url: "" })).filter((item) => item.title);
+  data.news = [...document.querySelectorAll("[data-news-index]")].map((box) => ({ title: box.querySelector("[data-news-title]").value.trim(), excerpt: box.querySelector("[data-news-excerpt]").value.trim(), body: box.querySelector("[data-news-body]").value.trim(), image: box.querySelector("[data-news-image-data]").value || box.querySelector("[data-news-image-url]").value.trim(), attachments: [...box.querySelectorAll("[data-news-attachment]")].map((input) => input.value), url: "" })).filter((item) => item.title);
   return data;
 }
 
@@ -69,6 +85,37 @@ editor.addEventListener("click", (event) => { if (event.target.matches("[data-re
 editor.addEventListener("change", (event) => { if (!event.target.matches("[data-image-file]") || !event.target.files[0]) return; const reader = new FileReader(); reader.onload = () => { const row = event.target.closest(".admin-image-row"); row.querySelector("[data-image-url]").value = reader.result; row.querySelector(".admin-image-preview")?.setAttribute("src", reader.result); }; reader.readAsDataURL(event.target.files[0]); });
 form.addEventListener("change", (event) => { if (!event.target.matches("[data-map-image-file]") || !event.target.files[0]) return; const reader = new FileReader(); reader.onload = () => { form.querySelector("[data-map-image-url]").value = reader.result; form.querySelector("[data-map-image-preview]").src = reader.result; }; reader.readAsDataURL(event.target.files[0]); });
 form.querySelector("[data-map-image-url]").addEventListener("input", (event) => { form.querySelector("[data-map-image-preview]").src = event.target.value.trim() || defaults.mapImage; });
-newsEditor.addEventListener("click", (event) => { if (event.target.matches("[data-remove-news]")) event.target.closest("[data-news-index]").remove(); });
-form.addEventListener("submit", (event) => { event.preventDefault(); const status = document.querySelector("[data-admin-success]"); try { saveData(readData()); status.textContent = "Alterações salvas neste navegador."; } catch { status.textContent = "Não foi possível salvar. Tente uma imagem de mapa menor."; } setTimeout(() => status.textContent = "", 5000); });
+newsEditor.addEventListener("click", (event) => { if (event.target.matches("[data-remove-news]")) event.target.closest("[data-news-index]").remove(); if (event.target.matches("[data-remove-news-attachment]")) event.target.closest(".admin-attachment").remove(); });
+newsEditor.addEventListener("input", (event) => { if (!event.target.matches("[data-news-image-url]")) return; const box = event.target.closest("[data-news-index]"); box.querySelector("[data-news-image-data]").value = ""; box.querySelector("[data-news-image-preview]").src = event.target.value.trim(); });
+newsEditor.addEventListener("change", async (event) => {
+  const fileInput = event.target;
+  const box = fileInput.closest("[data-news-index]");
+  if (!box || !fileInput.files?.length) return;
+  const status = box.querySelector("[data-news-image-status]");
+  try {
+    if (fileInput.matches("[data-news-image-file]")) {
+      const image = await imageFileToDataUrl(fileInput.files[0]);
+      box.querySelector("[data-news-image-data]").value = image;
+      box.querySelector("[data-news-image-url]").value = "";
+      box.querySelector("[data-news-image-preview]").src = image;
+      status.textContent = "Imagem carregada. Clique em Salvar alterações para aplicar.";
+    } else if (fileInput.matches("[data-news-files]")) {
+      const list = box.querySelector(".admin-attachment-list");
+      const images = await Promise.all([...fileInput.files].map(imageFileToDataUrl));
+      images.forEach((image) => {
+        const attachment = document.createElement("div");
+        attachment.className = "admin-attachment";
+        attachment.innerHTML = '<img alt="Prévia do anexo" /><input type="hidden" data-news-attachment /><button type="button" data-remove-news-attachment aria-label="Remover anexo">×</button>';
+        attachment.querySelector("img").src = image;
+        attachment.querySelector("[data-news-attachment]").value = image;
+        list.append(attachment);
+      });
+      status.textContent = "Anexo(s) carregado(s). Clique em Salvar alterações para aplicar.";
+    }
+  } catch {
+    status.textContent = "Não foi possível processar essa imagem. Tente outro arquivo.";
+  }
+  fileInput.value = "";
+});
+form.addEventListener("submit", (event) => { event.preventDefault(); const status = document.querySelector("[data-admin-success]"); try { saveData(readData()); status.textContent = "Alterações salvas neste navegador."; } catch { status.textContent = "Não foi possível salvar no armazenamento do navegador. Tente imagens menores."; } setTimeout(() => status.textContent = "", 5000); });
 if (sessionStorage.getItem("lemospassos-admin") === "1") { login.classList.add("is-hidden"); panel.classList.remove("is-hidden"); const data = getData(); render(data); enhanceNewsEditor(data); }
