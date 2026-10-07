@@ -140,8 +140,8 @@ function initFrontsExplorer() {
     grupo: {
       label: "O Grupo LemosPassos",
       index: "01 / 04",
-      image: "./assets/hero-kitchen.png",
-      alt: "Cozinha profissional do Grupo LemosPassos",
+      image: "./assets/img_sede_02.png",
+      alt: "Imagens das sedes do Grupo LemosPassos",
       href: "home.html#groupPage",
     },
     atuacoes: {
@@ -161,7 +161,7 @@ function initFrontsExplorer() {
     contatos: {
       label: "Contatos",
       index: "04 / 04",
-      image: "./assets/card-contatos.jpg",
+      image: "./assets/img_contato.png",
       alt: "Pessoas diversas em reunião",
       href: "contato.html",
     },
@@ -355,6 +355,8 @@ function initBrazilMap() {
   const map = document.querySelector("[data-brazil-map]");
   const image = map?.querySelector("img");
   if (!map || !image) return;
+
+  image.src = getCmsData().mapImage || "./assets/mapa-lemospassos.png";
 
   fetch(image.src)
     .then((response) => {
