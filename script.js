@@ -305,6 +305,7 @@ const cmsDefaults = {
     { title: "Dica da Nutri", excerpt: "Um prato colorido mostra a diversidade de nutrientes presentes na refeição.", image: "./assets/populares.jpg", url: "https://www.lemospassos.com.br/dica-da-nutri-2/" },
   ],
   mapImage: "./assets/mapa-lemospassos.png",
+  mapStates: ["AP", "AM", "PA", "CE", "PE", "BA", "SE", "MT", "GO", "DF", "MG", "SP"],
 };
 
 async function getCmsData() {
@@ -364,6 +365,11 @@ function initBrazilMap(cmsData) {
   if (!map || !image) return;
 
   image.src = cmsData.mapImage || "./assets/mapa-lemospassos.png";
+  const statesCaption = map.querySelector("[data-map-states]");
+  if (statesCaption) {
+    const states = Array.isArray(cmsData.mapStates) ? cmsData.mapStates : cmsDefaults.mapStates;
+    statesCaption.textContent = states.join(" · ");
+  }
 
   fetch(image.src)
     .then((response) => {

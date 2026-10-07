@@ -15,6 +15,7 @@ const defaults = {
     { title: "Dica da Nutri", excerpt: "Um prato colorido mostra a diversidade de nutrientes presentes na refeição.", image: "./assets/populares.jpg", url: "https://www.lemospassos.com.br/dica-da-nutri-2/" },
   ],
   mapImage: "./assets/mapa-lemospassos.png",
+  mapStates: ["AP", "AM", "PA", "CE", "PE", "BA", "SE", "MT", "GO", "DF", "MG", "SP"],
 };
 const starterBodies = [
   "Em cumprimento à legislação vigente, disponibilizamos o Relatório de Transparência e Igualdade Salarial de Mulheres e Homens, documento que reúne informações sobre a remuneração de profissionais e reforça o compromisso da organização com transparência, equidade e responsabilidade.",
@@ -57,6 +58,7 @@ function render(data) {
   form.meals.value = data.metrics.meals; form.employees.value = data.metrics.employees; form.restaurants.value = data.metrics.restaurants;
   form.querySelector("[data-map-image-url]").value = data.mapImage || defaults.mapImage;
   form.querySelector("[data-map-image-preview]").src = data.mapImage || defaults.mapImage;
+  form.querySelector("[data-map-states]").value = (Array.isArray(data.mapStates) ? data.mapStates : defaults.mapStates).join(", ");
   editor.innerHTML = categories.map((category) => `<fieldset class="admin-fieldset"><legend>${escapeHtml(category)}</legend><div class="admin-image-list" data-category="${escapeHtml(category)}">${(data.partners[category] || []).map((url) => `<div class="admin-image-row"><img class="admin-image-preview" src="${escapeHtml(url)}" alt="" /><input value="${escapeHtml(url)}" data-image-url /><input type="file" accept="image/*" data-image-file /><button type="button" data-remove-image>Remover</button></div>`).join("")}</div><button type="button" class="admin-small-button" data-add-image data-category="${escapeHtml(category)}">+ Adicionar imagem</button></fieldset>`).join("");
   newsEditor.innerHTML = data.news.map((item, index) => {
     const image = item.image || "";
@@ -68,6 +70,7 @@ function readData() {
   const data = normalize(defaults);
   data.metrics = { meals: Number(form.meals.value), employees: Number(form.employees.value), restaurants: Number(form.restaurants.value) };
   data.mapImage = form.querySelector("[data-map-image-url]").value.trim() || defaults.mapImage;
+  data.mapStates = form.querySelector("[data-map-states]").value.split(",").map((state) => state.trim().toUpperCase()).filter(Boolean);
   data.partners = Object.fromEntries(categories.map((category) => [category, [...document.querySelectorAll(`[data-category="${category}"] [data-image-url]`)].map((input) => input.value.trim()).filter(Boolean)]));
   data.news = [...newsEditor.querySelectorAll("[data-news-index]")].map((box) => ({ title: box.querySelector("[data-news-title]").value.trim(), excerpt: box.querySelector("[data-news-excerpt]").value.trim(), body: box.querySelector("[data-news-body]").value.trim(), image: box.querySelector("[data-news-image-data]").value || box.querySelector("[data-news-image-url]").value.trim(), attachments: [...box.querySelectorAll("[data-news-attachment]")].map((input) => input.value), url: box.querySelector("[data-news-url]").value.trim() })).filter((item) => item.title);
   return data;

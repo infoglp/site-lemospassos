@@ -94,5 +94,19 @@ function valid_content(array $data): array
             send_json(['error' => 'Indicadores inválidos.'], 422);
         }
     }
+    $allowedStates = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
+    $mapStates = $data['mapStates'] ?? ['AP', 'AM', 'PA', 'CE', 'PE', 'BA', 'SE', 'MT', 'GO', 'DF', 'MG', 'SP'];
+    if (!is_array($mapStates) || count($mapStates) > count($allowedStates)) {
+        send_json(['error' => 'Lista de estados inválida. Use siglas únicas de estados brasileiros.'], 422);
+    }
+    foreach ($mapStates as $state) {
+        if (!is_string($state) || !in_array($state, $allowedStates, true)) {
+            send_json(['error' => 'Lista de estados inválida. Use siglas únicas de estados brasileiros.'], 422);
+        }
+    }
+    if (count(array_unique($mapStates)) !== count($mapStates)) {
+        send_json(['error' => 'Lista de estados inválida. Use siglas únicas de estados brasileiros.'], 422);
+    }
+    $data['mapStates'] = array_values($mapStates);
     return $data;
 }
