@@ -1,51 +1,76 @@
-# Site LemosPassos
+# Site institucional LemosPassos
 
-Protótipo do novo site institucional do Grupo LemosPassos.
+Site institucional estático com uma API PHP/MySQL usada pelo painel administrativo. Não há etapa de build: HTML, CSS e JavaScript são publicados diretamente.
 
-## Estrutura
+## Páginas e arquivos principais
 
-- `index.html`: abertura animada com a assinatura "acima de tudo, o cuidado".
-- `home.html`: página inicial com apresentação do grupo, números, mapa de atuação e empresas parceiras.
-- `solucoes.html`: lista de frentes de atuação.
-- `solucao-*.html`: páginas internas de cada solução.
-- `trabalhe-conosco.html`: formulário de envio de currículo via e-mail.
-- `contato.html`: formulário de contato e endereços.
-- `noticias.html`: carrossel de notícias editável pelo painel.
-- `lgpd.html`: central de links e informações de privacidade.
-- `admin.html` / `admin.js`: painel para editar indicadores, imagens por categoria e notícias através do backend PHP/MySQL.
-- `api/`: endpoints PHP de autenticação, conteúdo e upload; `api/schema.sql` contém a tabela do CMS.
-- `styles.css`: estilos, responsividade e animações.
-- `script.js`: transições entre páginas, contador animado, cards interativos e formulários.
-- `local-server.mjs`: servidor local simples para teste.
-- `assets/`: imagens, identidade visual e mapa vetorial usado nas páginas. As fotos de cada solução, contato e cards ficam centralizadas nesta pasta com nomes normalizados para facilitar o carregamento.
+- `index.html`: abertura animada e entrada para o site.
+- `home.html`: página inicial, indicadores, mapa de atuação, notícias e conteúdo institucional.
+- `solucoes.html` e `solucao-*.html`: frentes e páginas de serviços.
+- `trabalhe-conosco.html`: apresentação e link para o portal externo de vagas da LG.
+- `contato.html`: endereços e formulário de contato, que prepara uma mensagem no cliente de e-mail do visitante.
+- `noticias.html`: lista e visualização de notícias.
+- `lgpd.html`: informações e links de privacidade.
+- `admin.html` / `admin.js`: painel administrativo.
+- `script.js` / `styles.css`: comportamento e apresentação compartilhados.
+- `api/`: API PHP de autenticação, conteúdo, upload e encerramento de sessão.
+- `assets/`: imagens, marcas e mapas.
+- `local-server.mjs`: pré-visualização local apenas das páginas estáticas.
 
-## Como testar
+## Pré-visualização local
 
-Abra `index.html` no navegador ou rode:
+Com Node.js instalado, na raiz do repositório:
 
-```bash
+```powershell
 node local-server.mjs
 ```
 
-Depois acesse `http://127.0.0.1:5174`.
+Acesse `http://127.0.0.1:5174`. Esse servidor simples não executa PHP; portanto, ele não testa o login, o banco MySQL nem os uploads do painel. Para testar essas funções, use o site publicado.
 
-## Observações
+## Painel e conteúdo administrável
 
-O site é estático e não possui etapa de build. Os formulários usam `mailto`, então o envio final depende do cliente de e-mail do usuário.
+O painel fica em `admin.html`. Com a API configurada, ele permite editar os indicadores da home, imagens de empresas parceiras, notícias (incluindo imagem principal e anexos), imagem do mapa e siglas dos estados exibidas abaixo do mapa. As alterações são gravadas no registro `site_content.id = 1` da tabela `site_content`.
 
-## Configuração do CMS na Hostinger
+Na seção **Mapa de atuação**:
 
-O site agora usa endpoints PHP no mesmo domínio. Antes de usar o painel em produção:
+- A imagem pode ser substituída por upload ou URL.
+- **Estados destacados** aceita siglas separadas por vírgula (por exemplo, `AP, AM, PA, CE, PE, BA, SE, MT, GO, DF, MG, SP`). A API aceita apenas siglas brasileiras válidas e sem duplicatas.
+- A lista de siglas altera o texto abaixo do mapa; ela não colore os polígonos dentro da imagem. Para mudar a representação visual dos estados, envie uma imagem de mapa já atualizada.
 
-1. O banco Hostinger existente já contém `site_content` (`id`, `content_json`, `updated_at`) e `lgpd_content`. **Não importe nem recrie o schema** nesse banco; a API usa o registro atual `site_content.id = 1` e preserva seu JSON.
-2. No Gerenciador de Arquivos, em `public_html/api`, copie `config.example.php` para `config.php` e preencha os dados de conexão fornecidos no hPanel. O arquivo `config.php` é ignorado pelo Git e bloqueado por `.htaccess`.
-3. Gere o hash da nova senha administrativa com PHP (`php -r "echo password_hash('SUA_SENHA_FORTE', PASSWORD_DEFAULT), PHP_EOL;"`) e preencha `admin_password_hash`. Use uma senha nova e exclusiva; não reutilize a senha do protótipo.
-4. Confirme que `public_html/api/uploads` existe e permite gravação pelo PHP. A pasta bloqueia execução de scripts; os uploads aceitam imagem JPG, PNG, WebP ou GIF até 8 MB antes da otimização pelo navegador.
+Os arquivos enviados pelo painel são armazenados em `api/uploads/`, com nomes aleatórios. São aceitos JPG, PNG, WebP e GIF, até 8 MB por arquivo enviado à API. A pasta impede a execução de scripts.
 
-Não publique `api/config.php` no repositório nem compartilhe a senha do banco por mensagens. A autenticação usa sessão PHP, cookie HttpOnly/SameSite e token CSRF; o conteúdo é lido publicamente e só pode ser gravado após login.
+## Backend e Hostinger
 
-Enquanto o backend não estiver publicado e configurado, as páginas públicas mantêm o conteúdo padrão. O registro já existente no MySQL deve permanecer intacto; ao conectar a API, ele será carregado no painel, sem migração ou sobrescrita inicial.
-## Conteudo administravel
+O ambiente de produção é a hospedagem Hostinger, com o repositório GitHub `https://github.com/infoglp/site-lemospassos`, branch `main`, publicado em `public_html`. Após enviar um commit para `origin/main`, confirme no hPanel se a implantação terminou e valide o site publicado.
 
-O painel permite editar os indicadores da home, organizar empresas nas categorias Hospitalar, Restaurantes, Área de Segurança e Merenda Escolar e cadastrar notícias com resumo, corpo completo e anexos de imagem. Notícias e arquivos são persistidos no MySQL e no diretório de uploads do servidor; as notícias abrem em `noticias.html`.
-O mapa principal usa `assets/mapa-lemospassos.png`. A arte anterior com as conexoes internacionais foi preservada em `assets/mapa-internacional.svg` para uso futuro.
+Para conectar a API no servidor:
+
+1. O banco existente da Hostinger já contém `site_content` e `lgpd_content`. A API do painel usa `site_content`, no registro de ID `1`; o painel atual não administra a tabela `lgpd_content`. Preserve os dados existentes. Não importe nem recrie tabelas durante uma atualização comum. Não há `api/schema.sql` neste repositório.
+2. Em `public_html/api`, copie `config.example.php` para `config.php` e preencha no próprio hPanel os dados MySQL e o hash da senha administrativa. O `config.php` está no `.gitignore` e o `api/.htaccess` impede seu acesso público.
+3. Garanta que `public_html/api/uploads` exista e possa ser gravada pelo PHP. `api/uploads/.htaccess` bloqueia execução de scripts.
+4. Se o editor de código do Gerenciador de Arquivos retornar `403` ao salvar `config.php`, crie o arquivo localmente e use **Upload/Enviar arquivo** para colocá-lo em `public_html/api`, substituindo-o. Esse procedimento já contornou o erro observado.
+
+O painel usa autenticação PHP com sessão, cookie `HttpOnly`/`SameSite`, token CSRF e limite de tentativas de login. A leitura do conteúdo é pública; gravações e uploads exigem sessão administrativa válida.
+
+### Segurança de configuração
+
+- Nunca faça commit ou push de `api/config.php`.
+- Não compartilhe senha do banco, senha administrativa, hash ou capturas do arquivo de configuração em mensagens ou chamados públicos.
+- Use senhas fortes e exclusivas. Gere o hash no servidor/localmente com PHP, sem inserir a senha real no comando salvo no histórico; a API verifica o hash usando `password_verify`.
+- Se uma credencial aparecer em uma captura ou conversa, troque-a no hPanel e atualize `config.php`.
+
+## Publicação de alterações
+
+O fluxo normal é editar e validar localmente, fazer commit e enviar para `main`:
+
+```powershell
+git status
+node --check script.js
+node --check admin.js
+git diff --check
+git add <arquivos-alterados>
+git commit -m "Descreva a alteração"
+git push origin main
+```
+
+Depois, acompanhe a implantação no hPanel. Mudanças em `config.php` e outros segredos são feitas diretamente no servidor e não devem entrar no Git.
