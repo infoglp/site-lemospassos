@@ -284,7 +284,6 @@ function initCounters() {
   counterObserver.observe(counters[0].closest(".group-stats"));
 }
 
-const CMS_KEY = "lemospassos-cms-v1";
 const cmsBodyDefaults = [
   "Em cumprimento à legislação vigente, disponibilizamos o Relatório de Transparência e Igualdade Salarial de Mulheres e Homens, documento que reúne informações sobre a remuneração de profissionais e reforça o compromisso da organização com transparência, equidade e responsabilidade.",
   "O presidente do Grupo Lemospassos, Ademar Lemos Jr., foi homenageado pelo CRA-BA durante a solenidade do Jubileu de Diamante da Administração, realizada na FIEB no dia 17/09. O encontro reuniu profissionais e autoridades para celebrar os 60 anos da regulamentação da profissão, reforçando a importância da ética, da técnica e da boa gestão para o desenvolvimento da sociedade. A programação seguiu com visitas técnicas dedicadas à história, às conquistas e ao futuro da Administração.",
@@ -305,30 +304,37 @@ const cmsDefaults = {
     { title: "Dia do Cliente", excerpt: "A confiança nasce nos gestos diários e se fortalece em cada etapa da nossa relação.", image: "./assets/card-contatos.jpg", url: "https://www.lemospassos.com.br/dia-do-cliente-2/" },
     { title: "Dica da Nutri", excerpt: "Um prato colorido mostra a diversidade de nutrientes presentes na refeição.", image: "./assets/populares.jpg", url: "https://www.lemospassos.com.br/dica-da-nutri-2/" },
   ],
+  mapImage: "./assets/mapa-lemospassos.png",
 };
 
-function getCmsData() {
+async function getCmsData() {
   try {
-    const data = { ...cmsDefaults, ...JSON.parse(localStorage.getItem(CMS_KEY) || "{}") };
-    data.news = (data.news || []).map((item, index) => ({ ...item, body: item.body || cmsBodyDefaults[index] || item.excerpt || "", attachments: item.attachments || [] }));
+    const response = await fetch("./api/content.php", { cache: "no-store" });
+    if (!response.ok) throw new Error("CMS indisponível");
+    const payload = await response.json();
+    const saved = payload.content || {};
+    const data = { ...cmsDefaults, ...saved, metrics: { ...cmsDefaults.metrics, ...(saved.metrics || {}) }, partners: { ...cmsDefaults.partners, ...(saved.partners || {}) }, news: Array.isArray(saved.news) ? saved.news : cmsDefaults.news };
+    data.news = data.news.map((item, index) => ({ ...item, body: item.body || cmsBodyDefaults[index] || item.excerpt || "", attachments: Array.isArray(item.attachments) ? item.attachments : [] }));
     return data;
   } catch {
     return cmsDefaults;
   }
 }
 
-function initCmsContent() {
-  const data = getCmsData();
+function escapeCmsHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]); }
+
+async function initCmsContent() {
+  const data = await getCmsData();
   document.querySelectorAll("[data-metric]").forEach((counter) => {
     if (data.metrics[counter.dataset.metric] != null) counter.dataset.target = data.metrics[counter.dataset.metric];
   });
 
   const categoryRoot = document.querySelector("[data-partner-categories]");
   if (categoryRoot) {
-    categoryRoot.innerHTML = `<div class="clients-title-row"><p class="eyebrow group-eyebrow"><span></span> Empresas que caminham conosco</p><span class="cms-hint">Por categoria</span></div><div class="partner-category-grid">${Object.entries(data.partners).map(([category, images]) => `<section class="partner-category"><h4>${category}</h4><div class="partner-window"><div class="partner-track">${images.filter(Boolean).map((image) => `<div class="client-logo"><img src="${image}" alt="Empresa parceira da categoria ${category}" /></div>`).join("")}</div></div></section>`).join("")}</div>`;
+    categoryRoot.innerHTML = `<div class="clients-title-row"><p class="eyebrow group-eyebrow"><span></span> Empresas que caminham conosco</p><span class="cms-hint">Por categoria</span></div><div class="partner-category-grid">${Object.entries(data.partners).map(([category, images]) => `<section class="partner-category"><h4>${escapeCmsHtml(category)}</h4><div class="partner-window"><div class="partner-track">${images.filter(Boolean).map((image) => `<div class="client-logo"><img src="${escapeCmsHtml(image)}" alt="Empresa parceira da categoria ${escapeCmsHtml(category)}" /></div>`).join("")}</div></div></section>`).join("")}</div>`;
   }
 
-  const newsMarkup = (item, index, heading = "h3") => `<a class="news-card" href="./noticias.html?noticia=${index}"><img src="${item.image}" alt="" /><span class="news-card-shade"></span><div><small>Notícia</small><${heading}>${item.title}</${heading}><p>${item.excerpt || ""}</p></div><b>↗</b></a>`;
+  const newsMarkup = (item, index, heading = "h3") => `<a class="news-card" href="./noticias.html?noticia=${index}"><img src="${escapeCmsHtml(item.image)}" alt="" /><span class="news-card-shade"></span><div><small>Notícia</small><${heading}>${escapeCmsHtml(item.title)}</${heading}><p>${escapeCmsHtml(item.excerpt || "")}</p></div><b>↗</b></a>`;
   const newsRoot = document.querySelector("[data-news-carousel]");
   if (newsRoot) newsRoot.innerHTML = data.news.filter((item) => item.title && item.image).map((item, index) => newsMarkup(item, index)).join("");
 
@@ -337,9 +343,10 @@ function initCmsContent() {
     const news = data.news.filter((item) => item.title && item.image);
     const selected = Number(new URLSearchParams(window.location.search).get("noticia"));
     const feature = document.querySelector("[data-news-feature]");
-    if (feature && news[selected]) feature.innerHTML = `<article class="news-feature"><img src="${news[selected].image}" alt="" /><div><small>Notícia</small><h2>${news[selected].title}</h2><p class="news-feature-body">${news[selected].body || news[selected].excerpt || ""}</p>${(news[selected].attachments || []).map((attachment) => `<img class="news-attachment" src="${attachment}" alt="Anexo da notícia" />`).join("")}<a class="text-link" href="./noticias.html">Voltar para notícias ↗</a></div></article>`;
+    if (feature && news[selected]) feature.innerHTML = `<article class="news-feature"><img src="${escapeCmsHtml(news[selected].image)}" alt="" /><div><small>Notícia</small><h2>${escapeCmsHtml(news[selected].title)}</h2><p class="news-feature-body">${escapeCmsHtml(news[selected].body || news[selected].excerpt || "")}</p>${(news[selected].attachments || []).map((attachment) => `<img class="news-attachment" src="${escapeCmsHtml(attachment)}" alt="Anexo da notícia" />`).join("")}<a class="text-link" href="./noticias.html">Voltar para notícias ↗</a></div></article>`;
     newsPage.innerHTML = news.map((item, index) => newsMarkup(item, index, "h2")).join("");
   }
+  return data;
 }
 
 function initOfficialLogos() {
@@ -351,12 +358,12 @@ function initOfficialLogos() {
   });
 }
 
-function initBrazilMap() {
+function initBrazilMap(cmsData) {
   const map = document.querySelector("[data-brazil-map]");
   const image = map?.querySelector("img");
   if (!map || !image) return;
 
-  image.src = getCmsData().mapImage || "./assets/mapa-lemospassos.png";
+  image.src = cmsData.mapImage || "./assets/mapa-lemospassos.png";
 
   fetch(image.src)
     .then((response) => {
@@ -445,7 +452,5 @@ initOfficialLogos();
 initIntro();
 initFrontsExplorer();
 initActuationCards();
-initCmsContent();
-initCounters();
-initBrazilMap();
+initCmsContent().then((cmsData) => { initCounters(); initBrazilMap(cmsData); }).catch(() => { initCounters(); initBrazilMap(cmsDefaults); });
 initMailForms();

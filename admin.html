@@ -20,13 +20,13 @@
         <div class="admin-panel-head"><div><p class="eyebrow"><span></span> Conteúdo do site</p><h1>Administração</h1></div><button class="admin-button admin-button-ghost" data-admin-logout>Sair</button></div>
         <form data-cms-form>
           <section class="admin-card"><h2>Indicadores da home</h2><div class="admin-grid admin-grid-3"><label>Refeições por dia<input name="meals" type="number" min="0" required /></label><label>Colaboradores<input name="employees" type="number" min="0" required /></label><label>Restaurantes atendidos<input name="restaurants" type="number" min="0" required /></label></div></section>
-          <section class="admin-card"><h2>Mapa de atuação</h2><p class="admin-help">Escolha um arquivo ou informe uma URL. A alteração fica salva neste navegador; para atualizar o mapa para todos os visitantes, é necessário publicar a imagem no site.</p><label>URL ou caminho da imagem<input type="text" data-map-image-url placeholder="./assets/mapa-lemospassos.png" /></label><label class="admin-map-file">Selecionar arquivo do mapa<input type="file" accept="image/*" data-map-image-file /></label><img class="admin-map-preview" data-map-image-preview alt="Prévia do mapa selecionado" /></section>
-          <section class="admin-card"><h2>Empresas por categoria</h2><p class="admin-help">Adicione URLs de imagens ou selecione arquivos. Em um site estático, estas alterações ficam salvas neste navegador.</p><div data-partner-editor></div></section>
-          <section class="admin-card"><h2>Notícias</h2><p class="admin-help">Escolha um arquivo para a imagem principal ou informe uma URL. A prévia aparece imediatamente; depois clique em “Salvar alterações”. As alterações ficam salvas neste navegador.</p><div data-news-editor></div><button class="admin-button admin-button-ghost" type="button" data-add-news>+ Adicionar notícia</button></section>
+          <section class="admin-card"><h2>Mapa de atuação</h2><p class="admin-help">Escolha uma imagem ou informe uma URL. Ao salvar, o arquivo e o conteúdo serão publicados no servidor.</p><label>URL ou caminho da imagem<input type="text" data-map-image-url placeholder="./assets/mapa-lemospassos.png" /></label><label class="admin-map-file">Selecionar arquivo do mapa<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-map-image-file /></label><img class="admin-map-preview" data-map-image-preview alt="Prévia do mapa selecionado" /></section>
+          <section class="admin-card"><h2>Empresas por categoria</h2><p class="admin-help">As imagens e alterações serão salvas no servidor e exibidas para todos os visitantes.</p><div data-partner-editor></div></section>
+          <section class="admin-card"><h2>Notícias</h2><p class="admin-help">Selecione uma imagem ou informe uma URL. Ao salvar, as notícias e os arquivos serão gravados no servidor para todos os visitantes.</p><div data-news-editor></div><button class="admin-button admin-button-ghost" type="button" data-add-news>+ Adicionar notícia</button></section>
           <button class="admin-button" type="submit">Salvar alterações ↗</button><p class="admin-success" data-admin-success></p>
         </form>
       </section>
     </main>
-    <script src="./admin.js?v=20261007-2"></script>
+    <script src="./admin.js?v=20261007-3"></script>
   </body>
 </html>
