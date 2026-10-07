@@ -7,6 +7,7 @@ Site institucional estático com uma API PHP/MySQL usada pelo painel administrat
 - `index.html`: abertura animada e entrada para o site.
 - `home.html`: página inicial, indicadores, mapa de atuação, notícias e conteúdo institucional.
 - `solucoes.html` e `solucao-*.html`: frentes e páginas de serviços.
+- `assets/hospitalar-nova.jpg`: foto usada no card e na página de Alimentação Hospitalar.
 - `trabalhe-conosco.html`: apresentação e link para o portal externo de vagas da LG.
 - `contato.html`: endereços e formulário de contato, que prepara uma mensagem no cliente de e-mail do visitante.
 - `noticias.html`: lista e visualização de notícias.
