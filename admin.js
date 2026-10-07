@@ -1,5 +1,4 @@
 const CMS_KEY = "lemospassos-cms-v1";
-const categories = ["Hospitalar", "Restaurantes", "Área de Segurança", "Merenda Escolar"];
 const defaults = {
   metrics: { meals: 400000, employees: 3500, restaurants: 431 },
   partners: {
@@ -27,12 +26,12 @@ let csrfToken = "";
 const login = document.querySelector("[data-admin-login]");
 const panel = document.querySelector("[data-admin-panel]");
 const form = document.querySelector("[data-cms-form]");
-const editor = document.querySelector("[data-partner-editor]");
 const newsEditor = document.querySelector("[data-news-editor]");
+let currentContent = normalize(defaults);
 document.querySelector("[data-admin-login] img")?.setAttribute("src", "./assets/logo-oficial.png");
 document.querySelector("link[rel='icon']")?.setAttribute("href", "./assets/logo-oficial.png");
 const backLink = document.createElement("a");
-backLink.className = "admin-back-link"; backLink.href = "./home.html"; backLink.textContent = "← Voltar para o site";
+backLink.className = "admin-back-link"; backLink.href = "./"; backLink.textContent = "← Voltar para o site";
 document.querySelector(".admin-panel-head")?.prepend(backLink);
 
 async function api(path, options = {}) {
@@ -55,11 +54,11 @@ function normalize(input) {
 }
 
 function render(data) {
+  currentContent = normalize(data);
   form.meals.value = data.metrics.meals; form.employees.value = data.metrics.employees; form.restaurants.value = data.metrics.restaurants;
   form.querySelector("[data-map-image-url]").value = data.mapImage || defaults.mapImage;
   form.querySelector("[data-map-image-preview]").src = data.mapImage || defaults.mapImage;
   form.querySelector("[data-map-states]").value = (Array.isArray(data.mapStates) ? data.mapStates : defaults.mapStates).join(", ");
-  editor.innerHTML = categories.map((category) => `<fieldset class="admin-fieldset"><legend>${escapeHtml(category)}</legend><div class="admin-image-list" data-category="${escapeHtml(category)}">${(data.partners[category] || []).map((url) => `<div class="admin-image-row"><img class="admin-image-preview" src="${escapeHtml(url)}" alt="" /><input value="${escapeHtml(url)}" data-image-url /><input type="file" accept="image/*" data-image-file /><button type="button" data-remove-image>Remover</button></div>`).join("")}</div><button type="button" class="admin-small-button" data-add-image data-category="${escapeHtml(category)}">+ Adicionar imagem</button></fieldset>`).join("");
   newsEditor.innerHTML = data.news.map((item, index) => {
     const image = item.image || "";
     return `<fieldset class="admin-fieldset" data-news-index="${index}"><legend>Notícia ${index + 1}</legend><label>Título<input value="${escapeHtml(item.title)}" data-news-title /></label><label>Resumo<textarea data-news-excerpt>${escapeHtml(item.excerpt)}</textarea></label><label>URL ou caminho da imagem<input value="${image.startsWith("data:image/") ? "" : escapeHtml(image)}" data-news-image-url /></label><input type="hidden" value="${image.startsWith("data:image/") ? escapeHtml(image) : ""}" data-news-image-data /><label class="admin-news-image-file">Selecionar arquivo da imagem principal<input type="file" accept="image/*" data-news-image-file /></label><img class="admin-news-image-preview" src="${escapeHtml(image)}" alt="Prévia da imagem principal da notícia" data-news-image-preview /><label>Link externo<input value="${escapeHtml(item.url || "")}" data-news-url /></label><label>Corpo da notícia<textarea data-news-body rows="7">${escapeHtml(item.body)}</textarea></label><label>Anexos da notícia<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-news-files /><div class="admin-attachment-list">${(item.attachments || []).map((src) => `<div class="admin-attachment"><img src="${escapeHtml(src)}" alt="" /><input type="hidden" value="${escapeHtml(src)}" data-news-attachment /><button type="button" data-remove-news-attachment aria-label="Remover anexo">×</button></div>`).join("")}</div></label><p class="admin-image-status" data-news-image-status></p><button type="button" class="admin-small-button" data-remove-news>Remover notícia</button></fieldset>`;
@@ -67,11 +66,10 @@ function render(data) {
 }
 
 function readData() {
-  const data = normalize(defaults);
+  const data = normalize(currentContent);
   data.metrics = { meals: Number(form.meals.value), employees: Number(form.employees.value), restaurants: Number(form.restaurants.value) };
   data.mapImage = form.querySelector("[data-map-image-url]").value.trim() || defaults.mapImage;
   data.mapStates = form.querySelector("[data-map-states]").value.split(",").map((state) => state.trim().toUpperCase()).filter(Boolean);
-  data.partners = Object.fromEntries(categories.map((category) => [category, [...document.querySelectorAll(`[data-category="${category}"] [data-image-url]`)].map((input) => input.value.trim()).filter(Boolean)]));
   data.news = [...newsEditor.querySelectorAll("[data-news-index]")].map((box) => ({ title: box.querySelector("[data-news-title]").value.trim(), excerpt: box.querySelector("[data-news-excerpt]").value.trim(), body: box.querySelector("[data-news-body]").value.trim(), image: box.querySelector("[data-news-image-data]").value || box.querySelector("[data-news-image-url]").value.trim(), attachments: [...box.querySelectorAll("[data-news-attachment]")].map((input) => input.value), url: box.querySelector("[data-news-url]").value.trim() })).filter((item) => item.title);
   return data;
 }
@@ -85,8 +83,9 @@ async function uploadDataImage(value) {
 }
 async function persistImages(data) {
   data.mapImage = await uploadDataImage(data.mapImage);
-  for (const category of categories) {
-    for (let i = 0; i < data.partners[category].length; i++) data.partners[category][i] = await uploadDataImage(data.partners[category][i]);
+  for (const images of Object.values(data.partners || {})) {
+    if (!Array.isArray(images)) continue;
+    for (let i = 0; i < images.length; i++) images[i] = await uploadDataImage(images[i]);
   }
   for (const item of data.news) {
     item.image = await uploadDataImage(item.image);
@@ -117,10 +116,6 @@ document.querySelector("[data-admin-logout]").addEventListener("click", async ()
 document.querySelector("[data-add-news]").addEventListener("click", () => {
   const data = readData(); data.news.push({ title: "", excerpt: "", body: "", image: "./assets/hero-kitchen.png", attachments: [], url: "" }); render(data);
 });
-editor.addEventListener("click", (event) => {
-  if (event.target.matches("[data-remove-image]")) event.target.closest(".admin-image-row").remove();
-  if (event.target.matches("[data-add-image]")) document.querySelector(`[data-category="${CSS.escape(event.target.dataset.category)}"]`).insertAdjacentHTML("beforeend", '<div class="admin-image-row"><img class="admin-image-preview" alt="" /><input placeholder="URL ou caminho da imagem" data-image-url /><input type="file" accept="image/*" data-image-file /><button type="button" data-remove-image>Remover</button></div>');
-});
 async function previewFile(file, callback) {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, 2000 / bitmap.width, 2000 / bitmap.height);
@@ -128,7 +123,6 @@ async function previewFile(file, callback) {
   canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height); bitmap.close();
   callback(canvas.toDataURL("image/webp", 0.84));
 }
-editor.addEventListener("change", async (event) => { if (event.target.matches("[data-image-file]") && event.target.files[0]) { const input = event.target; try { await previewFile(input.files[0], (src) => { const row = input.closest(".admin-image-row"); row.querySelector("[data-image-url]").value = src; row.querySelector("img").src = src; }); } catch { document.querySelector("[data-admin-success]").textContent = "Não foi possível ler essa imagem."; } input.value = ""; } });
 form.addEventListener("change", async (event) => { if (event.target.matches("[data-map-image-file]") && event.target.files[0]) { const input = event.target; try { await previewFile(input.files[0], (src) => { form.querySelector("[data-map-image-url]").value = src; form.querySelector("[data-map-image-preview]").src = src; }); } catch { document.querySelector("[data-admin-success]").textContent = "Não foi possível ler essa imagem."; } input.value = ""; } });
 form.querySelector("[data-map-image-url]").addEventListener("input", (event) => { form.querySelector("[data-map-image-preview]").src = event.target.value.trim() || defaults.mapImage; });
 newsEditor.addEventListener("click", (event) => { if (event.target.matches("[data-remove-news]")) event.target.closest("[data-news-index]").remove(); if (event.target.matches("[data-remove-news-attachment]")) event.target.closest(".admin-attachment").remove(); });

@@ -4,8 +4,8 @@ Site institucional estático com uma API PHP/MySQL usada pelo painel administrat
 
 ## Páginas e arquivos principais
 
-- `index.html`: abertura animada e entrada para o site.
-- `home.html`: página inicial, indicadores, mapa de atuação, notícias e conteúdo institucional.
+- `index.html`: abertura animada do site na raiz do domínio.
+- `home.html`: conteúdo da página inicial; a URL é normalizada para a raiz (`/`) após a abertura. As páginas internas mantêm seus próprios caminhos.
 - `solucoes.html` e `solucao-*.html`: frentes e páginas de serviços.
 - `assets/hospitalar-nova.jpg`: foto usada no card e na página de Alimentação Hospitalar.
 - `trabalhe-conosco.html`: apresentação e link para o portal externo de vagas da LG.

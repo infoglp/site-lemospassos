@@ -94,7 +94,7 @@ function initIntro() {
     }, pageDelay - 620);
 
     window.setTimeout(() => {
-      window.location.href = "home.html";
+      window.location.replace(`home.html${window.location.hash}`);
     }, pageDelay);
   }
 
@@ -142,7 +142,7 @@ function initFrontsExplorer() {
       index: "01 / 04",
       image: "./assets/img_sede_02.png",
       alt: "Imagens das sedes do Grupo LemosPassos",
-      href: "home.html#groupPage",
+      href: "./#groupPage",
     },
     atuacoes: {
       label: "Atuações",

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Conheça o Grupo LemosPassos, sua história, atuação e empresas parceiras." />
     <title>Grupo LemosPassos | Home</title>
+    <script>
+      if (window.location.pathname.endsWith("/home.html")) {
+        const homeRootPath = window.location.pathname.replace(/home\.html$/, "") || "/";
+        window.history.replaceState(window.history.state, "", `${homeRootPath}${window.location.search}${window.location.hash}`);
+      }
+    </script>
     <link rel="icon" type="image/png" href="./assets/lemos-passos.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,12 +20,12 @@
   <body>
     <section id="mainPage" class="main-page" aria-label="Página inicial">
       <header class="home-header">
-        <a class="home-brand" href="./home.html" aria-label="Grupo LemosPassos, início">
+        <a class="home-brand" href="./" aria-label="Grupo LemosPassos, início">
           <img src="./assets/lemos-passos.png" alt="Grupo LemosPassos" />
         </a>
 
         <nav class="home-nav" aria-label="Navegação principal">
-          <a href="./home.html#groupPage">O grupo</a>
+          <a href="./#groupPage">O grupo</a>
           <a href="./solucoes.html">Soluções</a>
           <a href="./trabalhe-conosco.html">Trabalhe conosco</a>
           <a href="./noticias.html">Notícias</a>
@@ -146,6 +152,6 @@
       </footer>
     </section>
 
-    <script src="./script.js?v=20261007-3"></script>
+    <script src="./script.js?v=20261007-4"></script>
   </body>
 </html>
