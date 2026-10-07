@@ -420,10 +420,12 @@ function initMailForms() {
 }
 
 function initSocialLinks() {
+  document.querySelectorAll('.site-credit a[href="./admin.html"]').forEach((link) => link.remove());
+
   const stylesheet = document.querySelector('link[rel="stylesheet"][href*="styles.css"]');
   if (stylesheet) {
     const stylesheetUrl = new URL(stylesheet.href);
-    stylesheetUrl.searchParams.set("v", "social-footer-career-20261005");
+    stylesheetUrl.searchParams.set("v", "mobile-menu-footer-20261007");
     stylesheet.href = stylesheetUrl.href;
   }
 
@@ -452,8 +454,57 @@ function initSocialLinks() {
   });
 }
 
+function initMobileMenus() {
+  document.querySelectorAll(".home-header, .page-header").forEach((header, index) => {
+    const nav = header.querySelector(".home-nav");
+    if (!nav || header.querySelector(".mobile-menu-toggle")) return;
+
+    const menuLink = header.querySelector(".home-menu");
+    if (menuLink && !nav.querySelector("[data-mobile-contact]") && menuLink.getAttribute("href")) {
+      const contactLink = document.createElement("a");
+      contactLink.href = menuLink.href;
+      contactLink.textContent = "Fale conosco";
+      contactLink.dataset.mobileContact = "true";
+      nav.append(contactLink);
+    }
+
+    if (!nav.id) nav.id = `primary-navigation-${index + 1}`;
+    const toggle = document.createElement("button");
+    toggle.className = "mobile-menu-toggle";
+    toggle.type = "button";
+    toggle.setAttribute("aria-label", "Abrir menu");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", nav.id);
+    toggle.innerHTML = '<span></span><span></span><span></span>';
+    header.append(toggle);
+
+    const closeMenu = () => {
+      nav.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Abrir menu");
+    };
+
+    toggle.addEventListener("click", () => {
+      const isOpen = toggle.getAttribute("aria-expanded") === "true";
+      nav.classList.toggle("is-open", !isOpen);
+      toggle.setAttribute("aria-expanded", String(!isOpen));
+      toggle.setAttribute("aria-label", isOpen ? "Abrir menu" : "Fechar menu");
+    });
+    nav.addEventListener("click", (event) => {
+      if (event.target.closest("a")) closeMenu();
+    });
+    document.addEventListener("click", (event) => {
+      if (!header.contains(event.target)) closeMenu();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenu();
+    });
+  });
+}
+
 initPageLoader();
 initSocialLinks();
+initMobileMenus();
 initOfficialLogos();
 initIntro();
 initFrontsExplorer();
