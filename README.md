@@ -11,6 +11,7 @@ Site institucional estático com uma API PHP/MySQL usada pelo painel administrat
 - `trabalhe-conosco.html`: apresentação e link para o portal externo de vagas da LG.
 - `contato.html`: endereços e formulário de contato, que prepara uma mensagem no cliente de e-mail do visitante.
 - `noticias.html`: lista e visualização de notícias.
+- `news-layout.css`: ajustes de layout e responsividade exclusivos da página de notícias.
 - `lgpd.html`: informações e links de privacidade.
 - `admin.html` / `admin.js`: painel administrativo.
 - `script.js` / `styles.css`: comportamento e apresentação compartilhados.
