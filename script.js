@@ -55,6 +55,12 @@ function initPageLoader() {
 
     if (isExternal || isProtocolAction || isSamePageHash) return;
 
+    // The site root serves the one-time intro; internal Home/logo links should
+    // always open the actual home page instead of replaying that intro.
+    if (url.pathname === new URL("./", window.location.href).pathname && !url.hash) {
+      url.pathname = `${url.pathname.replace(/\/$/, "")}/home.html`;
+    }
+
     event.preventDefault();
     window.navigateWithLoader(url.href);
   });
@@ -73,6 +79,18 @@ function initIntro() {
   const signature = document.querySelector("#signature");
 
   if (!intro || !typedLineOne || !typedCareLead || !typedCareWord || !cursor || !signature) return;
+
+  const introSessionKey = "lemospassos-intro-seen";
+  try {
+    if (window.sessionStorage.getItem(introSessionKey) === "1") {
+      window.location.replace(`home.html${window.location.hash}`);
+      return;
+    }
+    window.sessionStorage.setItem(introSessionKey, "1");
+  } catch {
+    // If storage is unavailable, the internal navigation rewrite above still
+    // prevents the intro from replaying through the site's own Home links.
+  }
 
   const startDelay = 420;
   const lineGap = 300;
@@ -140,7 +158,7 @@ function initFrontsExplorer() {
     grupo: {
       label: "O Grupo LemosPassos",
       index: "01 / 04",
-      image: "./assets/img_sede_02.png",
+      image: "./assets/fotos_sede_nova.png",
       alt: "Imagens das sedes do Grupo LemosPassos",
       href: "./#groupPage",
     },
@@ -425,7 +443,7 @@ function initSocialLinks() {
   const stylesheet = document.querySelector('link[rel="stylesheet"][href*="styles.css"]');
   if (stylesheet) {
     const stylesheetUrl = new URL(stylesheet.href);
-    stylesheetUrl.searchParams.set("v", "mobile-menu-footer-20261007");
+    stylesheetUrl.searchParams.set("v", "mobile-menu-footer-20261008");
     stylesheet.href = stylesheetUrl.href;
   }
 
