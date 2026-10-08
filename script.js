@@ -158,7 +158,7 @@ function initFrontsExplorer() {
     grupo: {
       label: "O Grupo LemosPassos",
       index: "01 / 04",
-      image: "./assets/fotos_sede_nova.png",
+      image: "./assets/fotos_sede_nova.png?v=20261008-2",
       alt: "Imagens das sedes do Grupo LemosPassos",
       href: "./#groupPage",
     },
@@ -247,7 +247,18 @@ function initActuationCards() {
   const actuationCards = document.querySelectorAll(".actuation-card");
   if (!actuationCards.length) return;
 
+  const refreshedImages = {
+    Educacional: "./assets/educacional-merenda.png?v=20261008-2",
+    Facilities: "./assets/facilities-nova.jpg?v=20261008-2",
+    "Administração e Alojamentos": "./assets/alojamento-novo.png?v=20261008-2",
+  };
+
   actuationCards.forEach((card) => {
+    const heading = card.querySelector("h2, h3")?.textContent.trim();
+    if (refreshedImages[heading]) {
+      card.style.setProperty("--card-image", `url('${refreshedImages[heading]}')`);
+    }
+
     card.addEventListener("click", () => {
       if (card.dataset.href) {
         window.navigateWithLoader(card.dataset.href);
@@ -454,6 +465,21 @@ function initSocialLinks() {
 
   document.querySelectorAll(".home-nav a").forEach((link) => {
     if (link.textContent.trim().toLocaleLowerCase("pt-BR") === "contato") link.remove();
+  });
+
+  document.querySelectorAll(".home-nav").forEach((nav) => {
+    const hasNewsLink = [...nav.querySelectorAll("a")].some((link) => {
+      const target = new URL(link.href, window.location.href);
+      return target.pathname.endsWith("/noticias.html");
+    });
+    if (hasNewsLink) return;
+
+    const newsLink = document.createElement("a");
+    newsLink.href = "./noticias.html";
+    newsLink.textContent = "Notícias";
+    const lgpdLink = [...nav.querySelectorAll("a")].find((link) => link.textContent.trim().toLocaleLowerCase("pt-BR") === "lgpd");
+    const employeeLink = nav.querySelector(".employee-access");
+    nav.insertBefore(newsLink, lgpdLink || employeeLink || null);
   });
 
   document.querySelectorAll(".home-header, .page-header").forEach((header) => {
